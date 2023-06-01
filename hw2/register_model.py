@@ -28,6 +28,11 @@ def train_and_log_model(data_path, params):
     X_test, y_test = load_pickle(os.path.join(data_path, "test.pkl"))
 
     with mlflow.start_run():
+
+        mlflow.log_param("train-data-path", "./output/train.pkl")
+        mlflow.log_param("valid-data-path", "./output/val.pkl")
+        mlflow.log_artifact("output/dv.pkl", artifact_path="artifacts")
+
         for param in RF_PARAMS:
             params[param] = int(params[param])
 

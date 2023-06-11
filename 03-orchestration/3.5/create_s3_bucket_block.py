@@ -1,7 +1,8 @@
 from time import sleep
 from prefect_aws import S3Bucket, AwsCredentials
 import os
-
+from dotenv import load_dotenv
+load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), '.env'))
 
 def create_aws_creds_block():
     my_aws_creds_obj = AwsCredentials(

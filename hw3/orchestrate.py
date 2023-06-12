@@ -132,7 +132,7 @@ def train_best_model(
 
     return rmse
 
-@task
+@flow
 def send_email(rmse, email_addresses):
     email_server_credentials = EmailServerCredentials.load("hw-email-yan-nusinovich")
     for email_address in email_addresses:

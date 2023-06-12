@@ -8,7 +8,7 @@ deployments:
   work_pool:
     name: zoompool
 - name: hw3
-  entrypoint: hw3/orchestrate.py:main_flow
+  entrypoint: hw3/orchestrate.py:main_flow_hw
   work_pool:
     name: hwpool
   schedule:

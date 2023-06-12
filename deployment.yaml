@@ -3,10 +3,14 @@ deployments:
   entrypoint: 03-orchestration/3.4/orchestrate.py:main_flow
   work_pool:
     name: zoompool
-  schedule:
-    cron: 0 9 3 * *
-    timezone: America/New_York
 - name: taxi_s3_data
   entrypoint: 03-orchestration/3.5/orchestrate_s3.py:main_flow_s3
   work_pool:
     name: zoompool
+- name: hw3
+  entrypoint: hw3/orchestrate.py:main_flow
+  work_pool:
+    name: hwpool
+  schedule:
+    cron: 0 9 3 * *
+    timezone: America/New_York

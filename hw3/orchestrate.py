@@ -13,6 +13,7 @@ from prefect.artifacts import create_markdown_artifact
 from datetime import date
 from prefect_email import EmailServerCredentials, email_send_message
 import os
+from typing import List
 from dotenv import load_dotenv
 load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), '.env'))
 
@@ -135,19 +136,21 @@ def train_best_model(
 @flow
 def send_email(rmse, email_addresses):
     email_server_credentials = EmailServerCredentials.load("hw-email-yan-nusinovich")
-    for email_address in email_addresses:
-        subject = email_send_message.with_options(name=f"email {email_address}").submit(
-            email_server_credentials=email_server_credentials,
-            subject="RMSE Results Report",
-            msg=f"RMSE of the latest run was {rmse}",
-            email_to=email_address,
-        )
+    if email_addresses != []:
+        for email_address in email_addresses:
+            subject = email_send_message.with_options(name=f"email {email_address}").submit(
+                email_server_credentials=email_server_credentials,
+                subject="RMSE Results Report",
+                msg=f"RMSE of the latest run was {rmse}",
+                email_to=email_address,
+            )
 
 
 @flow
 def main_flow_hw(
     train_path: str = "./data/green_tripdata_2023-02.parquet",
     val_path: str = "./data/green_tripdata_2023-03.parquet",
+    emails: List[str] = []
 ) -> None:
     """The main training pipeline"""
 
@@ -165,7 +168,7 @@ def main_flow_hw(
     # Train
     rmse = train_best_model(X_train, X_val, y_train, y_val, dv)
 
-    send_email(rmse, [os.getenv("EMAIL")])
+    send_email(rmse, emails)
 
 
 if __name__ == "__main__":

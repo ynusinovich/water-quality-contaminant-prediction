@@ -11,6 +11,10 @@ import xgboost as xgb
 from prefect import flow, task
 from prefect.artifacts import create_markdown_artifact
 from datetime import date
+from prefect_email import EmailServerCredentials, email_send_message
+import os
+from dotenv import load_dotenv
+load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), '.env'))
 
 
 @task(retries=3, retry_delay_seconds=2)
@@ -126,7 +130,18 @@ def train_best_model(
             key="duration-model-report", markdown=markdown__rmse_report
         )
 
-    return None
+    return rmse
+
+@task
+def send_email(rmse, email_addresses):
+    email_server_credentials = EmailServerCredentials.load("hw-email-yan-nusinovich")
+    for email_address in email_addresses:
+        subject = email_send_message.with_options(name=f"email {email_address}").submit(
+            email_server_credentials=email_server_credentials,
+            subject="RMSE Results Report",
+            msg=f"RMSE of the latest run was {rmse}",
+            email_to=email_address,
+        )
 
 
 @flow
@@ -148,7 +163,9 @@ def main_flow_hw(
     X_train, X_val, y_train, y_val, dv = add_features(df_train, df_val)
 
     # Train
-    train_best_model(X_train, X_val, y_train, y_val, dv)
+    rmse = train_best_model(X_train, X_val, y_train, y_val, dv)
+
+    send_email(rmse, [os.getenv("EMAIL")])
 
 
 if __name__ == "__main__":

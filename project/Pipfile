@@ -9,6 +9,7 @@ xgboost = "*"
 scikit-learn = "*"
 mlflow = "*"
 pyarrow = "*"
+boto3 = "*"
 
 [dev-packages]
 ipykernel = "*"

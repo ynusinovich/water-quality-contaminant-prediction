@@ -7,7 +7,7 @@ import pandas as pd
 logging.basicConfig(level=logging.INFO)
 
 
-class DataSetCreator():
+class DatasetCreator():
     """Class to download and clean dataset."""
 
     def __init__(self, y):
@@ -15,7 +15,7 @@ class DataSetCreator():
         self.y = y
 
     def download_data(self):
-        """Download data."""
+        """Download data from the source."""
         if not os.path.exists("../data/"):
             os.makedirs("../data/")
         with open("data_sources.json", "r", encoding="utf-8") as file:
@@ -124,11 +124,12 @@ class DataSetCreator():
 
 def create_dataset(download, clean, y):
     """Main function for dataset creation."""
-    dataset_creator = DataSetCreator(y)
+    dataset_creator = DatasetCreator(y)
     if download:
         dataset_creator.download_data()
     if clean:
         dataset_creator.clean_data()
+
 
 if __name__ == "__main__":
 

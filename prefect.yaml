@@ -1,0 +1,57 @@
+# Welcome to your prefect.yaml file! You can you this file for storing and managing
+# configuration for deploying your flows. We recommend committing this file to source
+# control along with your flow code.
+
+# Generic metadata about this project
+name: project
+prefect-version: 2.11.3
+
+# build section allows you to manage and build docker images
+build:
+
+# push section allows you to manage if and how this project is uploaded to remote locations
+push:
+
+# pull section allows you to provide instructions for cloning this project in remote locations
+pull:
+- prefect.deployments.steps.git_clone:
+    repository: https://github.com/ynusinovich/mlops-zoomcamp-dtc.git
+    branch: main
+    access_token:
+
+# the deployments section allows you to provide configuration for deploying flows
+deployments:
+- name:
+  version:
+  tags: []
+  description:
+  schedule: {}
+  flow_name:
+  entrypoint:
+  parameters: {}
+  work_pool:
+    name:
+    work_queue_name:
+    job_variables: {}
+- name: project-deployment-data
+  version:
+  tags: []
+  description: Main function for dataset creation.
+  entrypoint: project/src/create_dataset.py:create_dataset
+  parameters: {}
+  work_pool:
+    name: project-pool
+    work_queue_name:
+    job_variables: {}
+  schedule:
+- name: project-deployment-train
+  version:
+  tags: []
+  description: Main function for model training.
+  entrypoint: project/src/train_model.py:train_model
+  parameters: {}
+  work_pool:
+    name: project-pool
+    work_queue_name:
+    job_variables: {}
+  schedule:

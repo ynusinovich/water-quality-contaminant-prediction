@@ -126,6 +126,8 @@ class DatasetCreator():
 @flow
 def create_dataset(download, clean, y):
     """Main function for dataset creation."""
+    directory = os.path.dirname(os.path.abspath(__file__))
+    os.chdir(directory)
     dataset_creator = DatasetCreator(y)
     if download:
         dataset_creator.download_data()
@@ -134,7 +136,4 @@ def create_dataset(download, clean, y):
 
 
 if __name__ == "__main__":
-
-    directory = os.path.dirname(os.path.abspath(__file__))
-    os.chdir(directory)
     create_dataset(download = True, clean = True, y = "Methyl tert-butyl ether (MTBE)")

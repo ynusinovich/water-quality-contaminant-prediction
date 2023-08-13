@@ -86,15 +86,14 @@ class ModelTrainer():
 @flow
 def train_model(tracking_server_host):
     """Main function for model training."""
+    os.environ["AWS_PROFILE"] = "default"
+    directory = os.path.dirname(os.path.abspath(__file__))
+    os.chdir(directory)
     model_trainer = ModelTrainer(tracking_server_host)
     model_trainer.load_data()
     model_trainer.run_training()
 
 
 if __name__ == "__main__":
-    os.environ["AWS_PROFILE"] = "default"
     TRACKING_SERVER_HOST = "ec2-54-147-5-224.compute-1.amazonaws.com"
-
-    directory = os.path.dirname(os.path.abspath(__file__))
-    os.chdir(directory)
     train_model(TRACKING_SERVER_HOST)

@@ -135,4 +135,7 @@ def create_dataset(download, clean, y):
 
 
 if __name__ == "__main__":
-    create_dataset(download = True, clean = True, y = "Methyl tert-butyl ether (MTBE)")
+    download = True
+    clean = True
+    y = "Methyl tert-butyl ether (MTBE)"
+    create_dataset(download, clean, y)

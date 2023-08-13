@@ -16,29 +16,29 @@ logging.basicConfig(level=logging.INFO)
 class ModelTrainer():
     """Class for loading the clean dataset and running training."""
 
-    def __init__(self, tracking_server_host):
+    def __init__(self, tracking_server_host, y):
         """Initialize the model trainer object."""
         self.tracking_server_host = tracking_server_host
+        self.y = y
 
     def load_data(self):
         """Load the data and create X and y"""
         df = pd.read_parquet("../data/df.parquet")
         train_df = pd.read_parquet("../data/train_df.parquet")
         val_df = pd.read_parquet("../data/val_df.parquet")
-        y = "Methyl tert-butyl ether (MTBE)"
-        X_col = [c for c in df.columns if c not in [y, "sample_date", "station_id"]]
-        return train_df, val_df, y, X_col
+        X_col = [c for c in df.columns if c not in [self.y, "sample_date", "station_id"]]
+        return train_df, val_df, X_col
 
     def run_training(self):
         """Run the model training with an XGBoost model and a range of parameters."""
-        train_df, val_df, y, X_col = self.load_data()
+        train_df, val_df, X_col = self.load_data()
         dv = DictVectorizer()
         train_dicts = train_df[X_col].to_dict(orient='records')
         X_train = dv.fit_transform(train_dicts)
         val_dicts = val_df[X_col].to_dict(orient='records')
         X_val = dv.transform(val_dicts)
-        y_train = train_df[y].values
-        y_val = val_df[y].values
+        y_train = train_df[self.y].values
+        y_val = val_df[self.y].values
         if not os.path.exists("../preprocessor/"):
             os.makedirs("../preprocessor/")
         with open("preprocessor/preprocessor.b", "wb") as f_out:
@@ -83,16 +83,17 @@ class ModelTrainer():
         return best_result
 
 @flow
-def train_model(tracking_server_host):
+def train_model(tracking_server_host, y):
     """Main function for model training."""
     os.environ["AWS_PROFILE"] = "default"
     directory = os.path.dirname(os.path.abspath(__file__))
     os.chdir(directory)
-    model_trainer = ModelTrainer(tracking_server_host)
+    model_trainer = ModelTrainer(tracking_server_host, y)
     model_trainer.load_data()
     model_trainer.run_training()
 
 
 if __name__ == "__main__":
     TRACKING_SERVER_HOST = "ec2-54-147-5-224.compute-1.amazonaws.com"
-    train_model(TRACKING_SERVER_HOST)
+    y = "Methyl tert-butyl ether (MTBE)"
+    train_model(TRACKING_SERVER_HOST, y)

@@ -20,7 +20,6 @@ class ModelTrainer():
         """Initialize the model trainer object."""
         self.tracking_server_host = tracking_server_host
 
-    @task
     def load_data(self):
         """Load the data and create X and y"""
         df = pd.read_parquet("../data/df.parquet")
@@ -30,7 +29,6 @@ class ModelTrainer():
         X_col = [c for c in df.columns if c not in [y, "sample_date", "station_id"]]
         return train_df, val_df, y, X_col
 
-    @task
     def run_training(self):
         """Run the model training with an XGBoost model and a range of parameters."""
         train_df, val_df, y, X_col = self.load_data()

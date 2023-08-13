@@ -8,7 +8,6 @@ import xgboost as xgb
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 from hyperopt.pyll import scope
 import pandas as pd
-from prefect import flow, task
 
 logging.basicConfig(level=logging.INFO)
 
@@ -83,7 +82,6 @@ class ModelTrainer():
         return best_result
 
 
-@flow
 def train_model(tracking_server_host):
     """Main function for model training."""
     os.environ["AWS_PROFILE"] = "default"

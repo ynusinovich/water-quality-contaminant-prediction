@@ -3,6 +3,7 @@ import os
 import logging
 import requests
 import pandas as pd
+from prefect import flow, task
 
 logging.basicConfig(level=logging.INFO)
 
@@ -14,6 +15,7 @@ class DatasetCreator():
         """Initialize the dataset creator."""
         self.y = y
 
+    @task(retries=10, retry_delay_seconds=3)
     def download_data(self):
         """Download data from the source."""
         if not os.path.exists("../data/"):
@@ -34,6 +36,7 @@ class DatasetCreator():
             open(f'../data/{item[0]}', 'wb').write(response.content)
         logging.info("Data download complete")
 
+    @task
     def clean_data(self):
         """Load and process the raw results."""
         field_results = pd.read_csv("../data/field_results.csv", low_memory=False)
@@ -101,6 +104,7 @@ class DatasetCreator():
         df.to_parquet("../data/df.parquet")
         logging.info("Data processing complete")
 
+    @task
     def train_val_test_split(self):
         """Split data along time axis into training, validation, and test."""
         df = pd.read_parquet("../data/df.parquet")
@@ -122,6 +126,7 @@ class DatasetCreator():
         test_df.to_parquet("../data/test_df.parquet")
 
 
+@flow
 def create_dataset(download, clean, y):
     """Main function for dataset creation."""
     dataset_creator = DatasetCreator(y)

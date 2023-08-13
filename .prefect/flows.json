@@ -1,4 +1,0 @@
-{
-  "create-dataset": "project/src/create_dataset.py:create_dataset",
-  "train-model": "project/src/train_model.py:train_model"
-}

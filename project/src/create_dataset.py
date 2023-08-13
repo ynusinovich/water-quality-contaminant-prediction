@@ -3,6 +3,7 @@ import os
 import logging
 import requests
 import pandas as pd
+from prefect import flow
 
 logging.basicConfig(level=logging.INFO)
 
@@ -121,7 +122,7 @@ class DatasetCreator():
         val_df.to_parquet("../data/val_df.parquet")
         test_df.to_parquet("../data/test_df.parquet")
 
-
+@flow
 def create_dataset(download, clean, y):
     """Main function for dataset creation."""
     directory = os.path.dirname(os.path.abspath(__file__))

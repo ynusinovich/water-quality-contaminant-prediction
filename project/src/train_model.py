@@ -13,10 +13,10 @@ logging.basicConfig(level=logging.INFO)
 
 
 class ModelTrainer():
-    """"""
+    """Class for loading the clean dataset and running training."""
 
     def __init__(self, tracking_server_host):
-        """"""
+        """Initialize the model trainer object."""
         self.tracking_server_host = tracking_server_host
 
     def load_data(self):
@@ -29,7 +29,7 @@ class ModelTrainer():
         return train_df, val_df, y, X_col
 
     def run_training(self):
-        """"""
+        """Run the model training with an XGBoost model and a range of parameters."""
         train_df, val_df, y, X_col = self.load_data()
         dv = DictVectorizer()
         train_dicts = train_df[X_col].to_dict(orient='records')
@@ -38,6 +38,10 @@ class ModelTrainer():
         X_val = dv.transform(val_dicts)
         y_train = train_df[y].values
         y_val = val_df[y].values
+        if not os.path.exists("../preprocessor/"):
+            os.makedirs("../preprocessor/")
+        with open("preprocessor/preprocessor.b", "wb") as f_out:
+            pickle.dump(dv, f_out)
         train = xgb.DMatrix(X_train, label=y_train)
         valid = xgb.DMatrix(X_val, label=y_val)
         mlflow.set_tracking_uri(f"http://{self.tracking_server_host}:5000")
@@ -57,9 +61,7 @@ class ModelTrainer():
                 y_pred = booster.predict(valid)
                 rmse = mean_squared_error(y_val, y_pred, squared=False)
                 mlflow.log_metric("rmse", rmse)
-                with open("models/preprocessor.b", "wb") as f_out:
-                    pickle.dump(dv, f_out)
-                mlflow.log_artifact("models/preprocessor.b", artifact_path="preprocessor")
+                mlflow.log_artifact("preprocessor/preprocessor.b", artifact_path="preprocessor")
             return {'loss': rmse, 'status': STATUS_OK}
         search_space = {
             'max_depth': scope.int(hp.quniform('max_depth', 4, 100, 1)),

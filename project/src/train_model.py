@@ -24,7 +24,7 @@ class ModelTrainer():
 
     def load_data(self):
         """Load the data and create X and y"""
-        s3_bucket_block = S3Bucket.load("mlops-zoomcamp-2023")
+        s3_bucket_block = S3Bucket.load("s3-bucket-example")
         s3_bucket_block.download_folder_to_path(from_folder="project/data", to_folder="../data")
         df = pd.read_parquet("../data/df.parquet")
         train_df = pd.read_parquet("../data/train_df.parquet")

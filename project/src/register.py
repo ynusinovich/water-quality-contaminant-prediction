@@ -9,8 +9,11 @@ logging.basicConfig(level=logging.INFO)
 
 
 @flow
-def register_model(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com", stage="Production",
-                experiment_name="water-quality-prediction-2", experiment_ids='3'):
+def register_model(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com",
+                   stage="Production",
+                   experiment_name="water-quality-prediction-2",
+                   experiment_ids='3',
+                   model_name = "water-quality-predictor-2"):
     mlflow.set_tracking_uri(f"http://{tracking_server_host}:5000")
     mlflow.set_experiment(experiment_name)
     client = MlflowClient(tracking_uri=f"http://{tracking_server_host}:5000")
@@ -22,7 +25,7 @@ def register_model(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.co
     )
     run_id = runs[0].info.run_id
     model_uri = f"runs:/{run_id}/model"
-    model_name = "water-quality-predictor"
+    model_name = model_name
     mlflow.register_model(model_uri=model_uri, name=model_name)
     model_version = 1
     client.transition_model_version_stage(
@@ -39,7 +42,8 @@ if __name__ == "__main__":
     stage = "Production"
     experiment_name="water-quality-prediction-2"
     experiment_ids='3'
+    model_name = "water-quality-predictor-2"
 
     directory = os.path.dirname(os.path.abspath(__file__))
     os.chdir(directory)
-    register_model(TRACKING_SERVER_HOST, stage, experiment_name, experiment_ids)
+    register_model(TRACKING_SERVER_HOST, stage, experiment_name, experiment_ids, model_name)

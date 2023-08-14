@@ -3,16 +3,19 @@ import os
 from mlflow.tracking import MlflowClient
 from mlflow.entities import ViewType
 import mlflow
+from prefect import flow
 
 logging.basicConfig(level=logging.INFO)
 
 
-def stage_model(tracking_server_host, stage):
+@flow
+def stage_model(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com", stage="Production",
+                experiment_name="water-quality-prediction-2", experiment_ids='3'):
     mlflow.set_tracking_uri(f"http://{tracking_server_host}:5000")
-    mlflow.set_experiment("water-quality-prediction")
+    mlflow.set_experiment(experiment_name)
     client = MlflowClient(tracking_uri=f"http://{tracking_server_host}:5000")
     runs = client.search_runs(
-        experiment_ids='1',
+        experiment_ids=experiment_ids,
         run_view_type=ViewType.ACTIVE_ONLY,
         max_results=1,
         order_by=["metrics.rmse ASC"]
@@ -32,9 +35,11 @@ def stage_model(tracking_server_host, stage):
 
 if __name__ == "__main__":
     os.environ["AWS_PROFILE"] = "default"
-    TRACKING_SERVER_HOST = "ec2-54-147-5-224.compute-1.amazonaws.com"
-    stage = "Staging"
+    TRACKING_SERVER_HOST = "ec2-3-90-105-109.compute-1.amazonaws.com"
+    stage = "Production"
+    experiment_name="water-quality-prediction-2"
+    experiment_ids='3'
 
     directory = os.path.dirname(os.path.abspath(__file__))
     os.chdir(directory)
-    stage_model(TRACKING_SERVER_HOST, stage)
+    stage_model(TRACKING_SERVER_HOST, stage, experiment_name, experiment_ids)

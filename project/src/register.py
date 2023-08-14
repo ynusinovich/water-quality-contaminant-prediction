@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 @flow
-def stage_model(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com", stage="Production",
+def register_model(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com", stage="Production",
                 experiment_name="water-quality-prediction-2", experiment_ids='3'):
     mlflow.set_tracking_uri(f"http://{tracking_server_host}:5000")
     mlflow.set_experiment(experiment_name)
@@ -42,4 +42,4 @@ if __name__ == "__main__":
 
     directory = os.path.dirname(os.path.abspath(__file__))
     os.chdir(directory)
-    stage_model(TRACKING_SERVER_HOST, stage, experiment_name, experiment_ids)
+    register_model(TRACKING_SERVER_HOST, stage, experiment_name, experiment_ids)

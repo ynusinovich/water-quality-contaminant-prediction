@@ -65,7 +65,7 @@ class ModelTrainer():
                 y_pred = booster.predict(valid)
                 rmse = mean_squared_error(y_val, y_pred, squared=False)
                 mlflow.log_metric("rmse", rmse)
-                mlflow.log_artifact("preprocessor/preprocessor.b", artifact_path="preprocessor")
+                mlflow.log_artifact("../preprocessor/preprocessor.b", artifact_path="preprocessor")
             return {'loss': rmse, 'status': STATUS_OK}
         search_space = {
             'max_depth': scope.int(hp.quniform('max_depth', 4, 100, 1)),

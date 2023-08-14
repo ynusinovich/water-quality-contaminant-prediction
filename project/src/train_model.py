@@ -44,7 +44,7 @@ class ModelTrainer():
         y_val = val_df[self.y].values
         if not os.path.exists("../preprocessor/"):
             os.makedirs("../preprocessor/")
-        with open("preprocessor/preprocessor.b", "wb") as f_out:
+        with open("../preprocessor/preprocessor.b", "wb") as f_out:
             pickle.dump(dv, f_out)
         train = xgb.DMatrix(X_train, label=y_train)
         valid = xgb.DMatrix(X_val, label=y_val)

@@ -49,7 +49,7 @@ class ModelTrainer():
         train = xgb.DMatrix(X_train, label=y_train)
         valid = xgb.DMatrix(X_val, label=y_val)
         mlflow.set_tracking_uri(f"http://{self.tracking_server_host}:5000")
-        mlflow.set_experiment("water-quality-prediction")
+        mlflow.set_experiment("water-quality-prediction-2")
         mlflow.xgboost.autolog()
         def objective(params):
             with mlflow.start_run():

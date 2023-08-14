@@ -86,7 +86,7 @@ class ModelTrainer():
         return best_result
 
 @flow
-def train_model(tracking_server_host="ec2-54-147-5-224.compute-1.amazonaws.com",
+def train_model(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com",
                 y="Methyl tert-butyl ether (MTBE)"):
     """Main function for model training."""
     os.environ["AWS_PROFILE"] = "default"
@@ -98,6 +98,6 @@ def train_model(tracking_server_host="ec2-54-147-5-224.compute-1.amazonaws.com",
 
 
 if __name__ == "__main__":
-    TRACKING_SERVER_HOST = "ec2-54-147-5-224.compute-1.amazonaws.com"
+    TRACKING_SERVER_HOST = "ec2-3-90-105-109.compute-1.amazonaws.com"
     y = "Methyl tert-butyl ether (MTBE)"
     train_model(TRACKING_SERVER_HOST, y)

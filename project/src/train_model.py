@@ -9,6 +9,7 @@ from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 from hyperopt.pyll import scope
 import pandas as pd
 from prefect import flow
+from prefect_aws import S3Bucket
 
 logging.basicConfig(level=logging.INFO)
 
@@ -23,6 +24,8 @@ class ModelTrainer():
 
     def load_data(self):
         """Load the data and create X and y"""
+        s3_bucket_block = S3Bucket.load("mlops-zoomcamp-2023")
+        s3_bucket_block.download_folder_to_path(from_folder="project/data", to_folder="../data")
         df = pd.read_parquet("../data/df.parquet")
         train_df = pd.read_parquet("../data/train_df.parquet")
         val_df = pd.read_parquet("../data/val_df.parquet")
@@ -83,7 +86,8 @@ class ModelTrainer():
         return best_result
 
 @flow
-def train_model(tracking_server_host, y):
+def train_model(tracking_server_host="ec2-54-147-5-224.compute-1.amazonaws.com",
+                y="Methyl tert-butyl ether (MTBE)"):
     """Main function for model training."""
     os.environ["AWS_PROFILE"] = "default"
     directory = os.path.dirname(os.path.abspath(__file__))

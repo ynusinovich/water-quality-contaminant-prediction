@@ -4,6 +4,7 @@ import logging
 import requests
 import pandas as pd
 from prefect import flow
+from prefect_aws import S3Bucket
 
 logging.basicConfig(level=logging.INFO)
 
@@ -122,8 +123,12 @@ class DatasetCreator():
         val_df.to_parquet("../data/val_df.parquet")
         test_df.to_parquet("../data/test_df.parquet")
 
+        s3_bucket_block = S3Bucket.load("mlops-zoomcamp-2023")
+        s3_bucket_block.put_directory(local_path="../data", to_path="project/data")
+
+
 @flow
-def create_dataset(download, clean, y):
+def create_dataset(download=True, clean=True, y="Methyl tert-butyl ether (MTBE)"):
     """Main function for dataset creation."""
     directory = os.path.dirname(os.path.abspath(__file__))
     os.chdir(directory)

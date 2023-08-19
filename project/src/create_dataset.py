@@ -2,6 +2,7 @@ import json
 import os
 import logging
 import requests
+import datetime
 import pandas as pd
 from prefect import flow
 from prefect_aws import S3Bucket
@@ -106,29 +107,25 @@ class DatasetCreator():
     def train_val_test_split(self):
         """Split data along time axis into training, validation, and test."""
         df = pd.read_parquet("../data/df.parquet")
-        train_ratio = 0.80
-        val_ratio = 0.10
-
-        num_samples = len(df)
-        train_size = int(train_ratio * num_samples)
-        val_size = int(val_ratio * num_samples)
-        test_size = num_samples - train_size - val_size
-
-        # perform the training-validation-test split
-        train_df = df.head(train_size)
-        val_df = df.iloc[train_size: train_size + val_size]
-        test_df = df.tail(test_size)
+        
+        train_max = datetime.date(2013,1,1)
+        val_max = datetime.date(2016,1,1)
+        test_max = datetime.date(2019,1,1)
+        df_model = df[df["sample_date"] < test_max]
+        train_df = df_model[df_model["sample_date"] < train_max]
+        val_df = df_model[(df_model["sample_date"] < val_max) & (df_model["sample_date"] > train_max)]
+        test_df = df_model[df_model["sample_date"]>val_max]
 
         train_df.to_parquet("../data/train_df.parquet")
         val_df.to_parquet("../data/val_df.parquet")
         test_df.to_parquet("../data/test_df.parquet")
 
-        s3_bucket_block = S3Bucket.load("s3-bucket-example")
+        s3_bucket_block = S3Bucket.load("mlops-zoomcamp-2023")
         s3_bucket_block.put_directory(local_path="../data", to_path="project/data")
 
 
 @flow
-def create_dataset(download=True, clean=True, split = True, y="Methyl tert-butyl ether (MTBE)"):
+def create_dataset(download=True, clean=True, split=True, y="Methyl tert-butyl ether (MTBE)"):
     """Main function for dataset creation."""
     directory = os.path.dirname(os.path.abspath(__file__))
     os.chdir(directory)

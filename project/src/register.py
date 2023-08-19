@@ -4,6 +4,7 @@ from mlflow.tracking import MlflowClient
 from mlflow.entities import ViewType
 import mlflow
 from prefect import flow
+from prefect_aws import S3Bucket
 
 logging.basicConfig(level=logging.INFO)
 
@@ -34,6 +35,8 @@ def register_model(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.co
         stage=stage,
         archive_existing_versions=True
     )
+    s3_bucket_block = S3Bucket.load("s3-bucket-example")
+    s3_bucket_block.put_directory(local_path="../data", to_path="project/data")
 
 
 if __name__ == "__main__":

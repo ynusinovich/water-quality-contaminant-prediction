@@ -120,7 +120,7 @@ class DatasetCreator():
         val_df.to_parquet("../data/val_df.parquet")
         test_df.to_parquet("../data/test_df.parquet")
 
-        s3_bucket_block = S3Bucket.load("mlops-zoomcamp-2023")
+        s3_bucket_block = S3Bucket.load("s3-bucket-example")
         s3_bucket_block.put_directory(local_path="../data", to_path="project/data")
 
 

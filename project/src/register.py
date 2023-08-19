@@ -14,7 +14,7 @@ def register_model(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.co
                    stage="Production",
                    experiment_name="water-quality-prediction-2",
                    experiment_ids='3',
-                   model_name = "water-quality-predictor-2"):
+                   model_name = "water-quality-predictor-3"):
     mlflow.set_tracking_uri(f"http://{tracking_server_host}:5000")
     mlflow.set_experiment(experiment_name)
     client = MlflowClient(tracking_uri=f"http://{tracking_server_host}:5000")
@@ -35,8 +35,6 @@ def register_model(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.co
         stage=stage,
         archive_existing_versions=True
     )
-    s3_bucket_block = S3Bucket.load("s3-bucket-example")
-    s3_bucket_block.put_directory(local_path="../data", to_path="project/data")
 
 
 if __name__ == "__main__":
@@ -45,7 +43,7 @@ if __name__ == "__main__":
     stage = "Production"
     experiment_name="water-quality-prediction-2"
     experiment_ids='3'
-    model_name = "water-quality-predictor-2"
+    model_name = "water-quality-predictor-3"
 
     directory = os.path.dirname(os.path.abspath(__file__))
     os.chdir(directory)

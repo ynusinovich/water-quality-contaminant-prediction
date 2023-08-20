@@ -64,7 +64,7 @@ def run_inference(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com
     pred, y_inf = inference_pipeline.run_pred(inf_df)
     rmse = mean_squared_error(y_inf, pred, squared=False)
     logger = get_run_logger()
-    logger.info("RMSE = {rmse}")
+    logger.info(f"RMSE = {rmse}")
     return {"rmse": rmse}
 
 

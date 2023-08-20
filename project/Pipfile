@@ -13,6 +13,9 @@ boto3 = "*"
 psycopg2-binary = "*"
 prefect = "*"
 prefect-aws = "*"
+requests = "*"
+evidently = "*"
+numpy = "*"
 
 [dev-packages]
 ipykernel = "*"

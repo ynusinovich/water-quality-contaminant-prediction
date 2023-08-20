@@ -14,3 +14,5 @@ prefect deploy project/src/inference.py:inference -n 'project-deployment-inferen
 docker-compose up --build
 ### Grafana default username and password:
 admin/admin
+### Monitoring Postgres default server, username, password, and database:
+db/postgres/example/test

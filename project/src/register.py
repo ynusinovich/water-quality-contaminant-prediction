@@ -1,8 +1,10 @@
+# pylint: disable=missing-module-docstring
 import logging
 import os
 from mlflow.tracking import MlflowClient
 from mlflow.entities import ViewType
 import mlflow
+# pylint: disable=import-error
 from prefect import flow, get_run_logger
 
 logging.basicConfig(level=logging.INFO)
@@ -14,6 +16,7 @@ def register(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com",
                    experiment_name="water-quality-prediction-2",
                    experiment_ids='3',
                    model_name = "water-quality-predictor-4"):
+    """Register the model that has the highest validation RMSE."""
     directory = os.path.dirname(os.path.abspath(__file__))
     os.chdir(directory)
     mlflow.set_tracking_uri(f"http://{tracking_server_host}:5000")
@@ -27,7 +30,6 @@ def register(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com",
     )
     run_id = runs[0].info.run_id
     model_uri = f"runs:/{run_id}/model"
-    model_name = model_name
     mlflow.register_model(model_uri=model_uri, name=model_name)
     model_version = 1
     client.transition_model_version_stage(
@@ -38,7 +40,6 @@ def register(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com",
     )
     logger = get_run_logger()
     logger.info("Data cleaning complete")
-    return None
 
 
 if __name__ == "__main__":

@@ -1,10 +1,11 @@
-import json
+# pylint: disable=missing-module-docstring
 import os
 import logging
-import requests
 import datetime
 import pandas as pd
+# pylint: disable=import-error
 from prefect import flow, task, get_run_logger
+# pylint: disable=import-error
 from prefect_aws import S3Bucket
 from common_functions import download_data, clean_data
 
@@ -15,14 +16,15 @@ logging.basicConfig(level=logging.INFO)
 def train_val_test_split():
     """Split data along time axis into training, validation, and test."""
     df = pd.read_parquet("../data/df.parquet")
-    
+    df.dropna(inplace=True)
+
     train_max = datetime.date(2013,1,1)
     val_max = datetime.date(2016,1,1)
     test_max = datetime.date(2019,1,1)
     df_model = df[df["sample_date"] < test_max]
     train_df = df_model[df_model["sample_date"] < train_max]
     val_df = df_model[(df_model["sample_date"] < val_max) & (df_model["sample_date"] > train_max)]
-    test_df = df_model[df_model["sample_date"]>val_max]
+    test_df = df_model[df_model["sample_date"] > val_max]
 
     train_df.to_parquet("../data/train_df.parquet")
     val_df.to_parquet("../data/val_df.parquet")
@@ -43,7 +45,7 @@ def create_dataset(y="Methyl tert-butyl ether (MTBE)"):
     directory = os.path.dirname(os.path.abspath(__file__))
     os.chdir(directory)
     download_data()
-    clean_data(y, "train")
+    clean_data(y)
     train_val_test_split()
 
 

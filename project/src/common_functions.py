@@ -1,8 +1,8 @@
+# pylint: disable=missing-module-docstring
 import logging
-import pandas as pd
 import json
 import os
-import logging
+import pandas as pd
 import requests
 
 logging.basicConfig(level=logging.INFO)
@@ -25,11 +25,14 @@ def download_data():
             logging.error("The request timed out. Try increasing the timeout value.")
         except requests.exceptions.RequestException as error:
             logging.error("An error occurred: %s", error)
-        open(f'../data/{item[0]}', 'wb').write(response.content)
+        # open(f'../data/{item[0]}', 'wb').write(response.content)
+        file_path = f'../data/{item[0]}'
+        with open(file_path, 'wb') as file:
+            file.write(response.content)
     logging.info("Data download complete.")
-        
 
-def clean_data(y, train_or_inf):
+
+def clean_data(y):
     """Load and process the raw results."""
     field_results = pd.read_csv("../data/field_results.csv", low_memory=False)
     field_results = field_results[field_results["station_type"] == "Surface Water"]
@@ -62,9 +65,6 @@ def clean_data(y, train_or_inf):
     df = results.pivot_table(index=['station_id', 'sample_date'],
                                 columns='parameter', values='result', aggfunc='first')
     df.reset_index(inplace=True)
-    if train_or_inf == "train":
-        mask = df[y].notnull()
-        df = df[mask]
     values_to_keep = ['station_id',
                         'sample_date',
                         'DissolvedOxygen',
@@ -78,25 +78,17 @@ def clean_data(y, train_or_inf):
                         y
                         ]
     df = df[values_to_keep]
-    if train_or_inf == "train":
-        df.dropna(inplace=True)
-    elif train_or_inf == "inf":
-        X_values_to_keep = [val for val in values_to_keep if val != y]
-        df[X_values_to_keep].dropna(inplace=True)
     df.replace("< R.L.", 0, inplace=True)
-    column_list = ["DissolvedOxygen",
-                    "SpecificConductance",
-                    "Total Alkalinity",
-                    "Total Dissolved Solids",
-                    "Total Organic Carbon",
-                    "Turbidity",
-                    "WaterTemperature",
-                    "pH",
-                    y
-                    ]
-    df[column_list] = df[column_list].astype(float)
-    if train_or_inf == "train":
-        df.to_parquet("../data/df.parquet")
-    elif train_or_inf == "inf":
-        df.to_parquet("../data/df_inf.parquet")
+    numerical_list = ["DissolvedOxygen",
+                      "SpecificConductance",
+                      "Total Alkalinity",
+                      "Total Dissolved Solids",
+                      "Total Organic Carbon",
+                      "Turbidity",
+                      "WaterTemperature",
+                      "pH",
+                      y
+                      ]
+    df[numerical_list] = df[numerical_list].astype(float)
+    df.to_parquet("../data/df.parquet")
     logging.info("Data cleaning complete.")

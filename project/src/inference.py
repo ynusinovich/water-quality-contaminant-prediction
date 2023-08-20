@@ -1,10 +1,12 @@
+# pylint: disable=missing-module-docstring
 import logging
 import pickle
 import os
-import pandas as pd
 import datetime
+import pandas as pd
 from sklearn.metrics import mean_squared_error
 import mlflow
+# pylint: disable=import-error
 from prefect import flow, get_run_logger
 from common_functions import download_data, clean_data
 
@@ -23,12 +25,15 @@ class InferencePipeline():
 
     def create_inf_df(self):
         """Create inference dataframe from latest data."""
-        df = pd.read_parquet("../data/df_inf.parquet")
+        df = pd.read_parquet("../data/df.parquet")
+        X_values_to_keep = [X for X in df.columns if X != self.y]
+        df[X_values_to_keep].dropna(inplace=True)
         test_max = datetime.date(2019,1,1)
         inf_df = df[df["sample_date"] > test_max]
         return inf_df
-    
+
     def run_pred(self, inf_df):
+        """Load mlflow model and artifacts, process inference data, and run prediction."""
         mlflow.set_tracking_uri(f"http://{self.tracking_server_host}:5000")
         model = mlflow.pyfunc.load_model(f"models:/{self.model_name}/{self.stage}")
         run_id = model.metadata.run_id
@@ -53,10 +58,11 @@ def inference(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com",
                        stage="Production",
                        model_name = "water-quality-predictor-3",
                        y="Methyl tert-butyl ether (MTBE)"):
+    """Main function for inference pipeline with new water quality data."""
     directory = os.path.dirname(os.path.abspath(__file__))
     os.chdir(directory)
     download_data()
-    clean_data(y, "inf")
+    clean_data(y)
     inference_pipeline = InferencePipeline(tracking_server_host, stage,
                                            model_name, y)
     inf_df = inference_pipeline.create_inf_df()

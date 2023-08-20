@@ -1,3 +1,4 @@
+# pylint: disable=missing-module-docstring
 import logging
 import os
 import pickle
@@ -8,7 +9,9 @@ import xgboost as xgb
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 from hyperopt.pyll import scope
 import pandas as pd
+# pylint: disable=import-error
 from prefect import flow, get_run_logger
+# pylint: disable=import-error
 from prefect_aws import S3Bucket
 
 logging.basicConfig(level=logging.INFO)

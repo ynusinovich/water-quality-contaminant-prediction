@@ -11,14 +11,14 @@ mlflow = "*"
 pyarrow = "*"
 boto3 = "*"
 psycopg2-binary = "*"
+prefect = "*"
+prefect-aws = "*"
 
 [dev-packages]
 ipykernel = "*"
 nbconvert = "*"
 jupyter = "*"
 hyperopt = "*"
-prefect = "*"
-prefect-aws = "*"
 
 [requires]
 python_version = "3.10"

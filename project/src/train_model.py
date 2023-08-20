@@ -8,7 +8,7 @@ import xgboost as xgb
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 from hyperopt.pyll import scope
 import pandas as pd
-from prefect import flow
+from prefect import flow, get_run_logger
 from prefect_aws import S3Bucket
 
 logging.basicConfig(level=logging.INFO)
@@ -30,7 +30,8 @@ class ModelTrainer():
         train_df = pd.read_parquet("../data/train_df.parquet")
         val_df = pd.read_parquet("../data/val_df.parquet")
         X_col = [c for c in df.columns if c not in [self.y, "sample_date", "station_id"]]
-        logging.info("Clean data loaded.")
+        logger = get_run_logger()
+        logger.info("Clean data loaded.")
         return train_df, val_df, X_col
 
     def run_training(self):
@@ -83,7 +84,8 @@ class ModelTrainer():
             max_evals=50,
             trials=Trials()
             )
-        logging.info("Model training complete")
+        logger = get_run_logger()
+        logger.info("Model training complete")
         return best_result
 
 
@@ -91,7 +93,6 @@ class ModelTrainer():
 def train_model(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com",
                 y="Methyl tert-butyl ether (MTBE)"):
     """Main function for model training."""
-    os.environ["AWS_PROFILE"] = "default"
     directory = os.path.dirname(os.path.abspath(__file__))
     os.chdir(directory)
     model_trainer = ModelTrainer(tracking_server_host, y)
@@ -100,6 +101,4 @@ def train_model(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com",
 
 
 if __name__ == "__main__":
-    TRACKING_SERVER_HOST = "ec2-3-90-105-109.compute-1.amazonaws.com"
-    y = "Methyl tert-butyl ether (MTBE)"
-    train_model(TRACKING_SERVER_HOST, y)
+    train_model()

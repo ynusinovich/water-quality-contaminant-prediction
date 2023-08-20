@@ -50,7 +50,7 @@ class InferencePipeline():
         return pred, y_inf
 
 @flow
-def run_inference(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com",
+def inference(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com",
                        stage="Production",
                        model_name = "water-quality-predictor-3",
                        y="Methyl tert-butyl ether (MTBE)"):
@@ -64,14 +64,9 @@ def run_inference(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com
     pred, y_inf = inference_pipeline.run_pred(inf_df)
     rmse = mean_squared_error(y_inf, pred, squared=False)
     logger = get_run_logger()
-    logger.info(f"RMSE = {rmse}")
+    logger.info(f"rmse = {rmse}")
     return {"rmse": rmse}
 
 
 if __name__ == "__main__":
-    y = "Methyl tert-butyl ether (MTBE)"
-    os.environ["AWS_PROFILE"] = "default"
-    TRACKING_SERVER_HOST = "ec2-3-90-105-109.compute-1.amazonaws.com"
-    stage = "Production"
-    model_name = "water-quality-predictor-3"
-    run_inference(TRACKING_SERVER_HOST, stage, model_name, y)
+    inference()

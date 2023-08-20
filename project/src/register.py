@@ -3,17 +3,19 @@ import os
 from mlflow.tracking import MlflowClient
 from mlflow.entities import ViewType
 import mlflow
-from prefect import flow
+from prefect import flow, get_run_logger
 
 logging.basicConfig(level=logging.INFO)
 
 
 @flow
-def register_model(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com",
+def register(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com",
                    stage="Production",
                    experiment_name="water-quality-prediction-2",
                    experiment_ids='3',
                    model_name = "water-quality-predictor-4"):
+    directory = os.path.dirname(os.path.abspath(__file__))
+    os.chdir(directory)
     mlflow.set_tracking_uri(f"http://{tracking_server_host}:5000")
     mlflow.set_experiment(experiment_name)
     client = MlflowClient(tracking_uri=f"http://{tracking_server_host}:5000")
@@ -34,18 +36,10 @@ def register_model(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.co
         stage=stage,
         archive_existing_versions=True
     )
-    logging.info("Data cleaning complete")
+    logger = get_run_logger()
+    logger.info("Data cleaning complete")
     return None
 
 
 if __name__ == "__main__":
-    os.environ["AWS_PROFILE"] = "default"
-    TRACKING_SERVER_HOST = "ec2-3-90-105-109.compute-1.amazonaws.com"
-    experiment_name="water-quality-prediction-2"
-    experiment_ids='3'
-    stage = "Production"
-    model_name = "water-quality-predictor-5"
-
-    directory = os.path.dirname(os.path.abspath(__file__))
-    os.chdir(directory)
-    register_model(TRACKING_SERVER_HOST, stage, experiment_name, experiment_ids, model_name)
+    register()

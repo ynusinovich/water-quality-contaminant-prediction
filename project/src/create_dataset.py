@@ -4,7 +4,7 @@ import logging
 import requests
 import datetime
 import pandas as pd
-from prefect import flow, task
+from prefect import flow, task, get_run_logger
 from prefect_aws import S3Bucket
 from common_functions import download_data, clean_data
 
@@ -31,7 +31,8 @@ def train_val_test_split():
     s3_bucket_block = S3Bucket.load("s3-bucket-example")
     s3_bucket_block.put_directory(local_path="../data", to_path="project/data")
 
-    logging.info("Data splitting complete")
+    logger = get_run_logger()
+    logger.info("Data splitting complete")
 
     return train_df, val_df, test_df
 
@@ -47,5 +48,4 @@ def create_dataset(y="Methyl tert-butyl ether (MTBE)"):
 
 
 if __name__ == "__main__":
-    y = "Methyl tert-butyl ether (MTBE)"
-    create_dataset(y)
+    create_dataset()

@@ -43,7 +43,7 @@ def create_dataset(y="Methyl tert-butyl ether (MTBE)"):
     directory = os.path.dirname(os.path.abspath(__file__))
     os.chdir(directory)
     download_data()
-    clean_data(y)
+    clean_data(y, "train")
     train_val_test_split()
 
 

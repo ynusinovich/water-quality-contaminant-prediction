@@ -6,7 +6,6 @@ import datetime
 from sklearn.metrics import mean_squared_error
 import mlflow
 from prefect import flow, get_run_logger
-import prefect
 from common_functions import download_data, clean_data
 
 logging.basicConfig(level=logging.INFO)
@@ -24,7 +23,7 @@ class InferencePipeline():
 
     def create_inf_df(self):
         """Create inference dataframe from latest data."""
-        df = pd.read_parquet("../data/df.parquet")
+        df = pd.read_parquet("../data/df_inf.parquet")
         test_max = datetime.date(2019,1,1)
         inf_df = df[df["sample_date"] > test_max]
         return inf_df
@@ -34,8 +33,8 @@ class InferencePipeline():
         model = mlflow.pyfunc.load_model(f"models:/{self.model_name}/{self.stage}")
         run_id = model.metadata.run_id
         mlflow.artifacts.download_artifacts(run_id=run_id,
-                                                        artifact_path="preprocessor",
-                                                        dst_path="../")
+                                            artifact_path="preprocessor",
+                                            dst_path="../")
         if not os.path.exists("../preprocessor/"):
             os.makedirs("../preprocessor/")
         with open("../preprocessor/preprocessor.b", "rb") as f_in:
@@ -57,15 +56,20 @@ def inference(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com",
     directory = os.path.dirname(os.path.abspath(__file__))
     os.chdir(directory)
     download_data()
-    clean_data(y)
+    clean_data(y, "inf")
     inference_pipeline = InferencePipeline(tracking_server_host, stage,
                                            model_name, y)
     inf_df = inference_pipeline.create_inf_df()
     pred, y_inf = inference_pipeline.run_pred(inf_df)
-    rmse = mean_squared_error(y_inf, pred, squared=False)
+    notnull_y_ind = [index for index, value in enumerate(y_inf) if pd.notnull(value)]
+    notnull_y = y_inf[y_inf.notnull()]
+    notnull_pred = pred[notnull_y_ind]
+    rmse = mean_squared_error(notnull_y, notnull_pred, squared=False)
     logger = get_run_logger()
     logger.info(f"rmse = {rmse}")
-    return {"rmse": rmse}
+    inf_df["pred"] = pred
+    inf_df.to_csv("../data/results.csv")
+    return rmse, pred
 
 
 if __name__ == "__main__":

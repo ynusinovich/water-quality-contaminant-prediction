@@ -17,7 +17,7 @@ def download_data():
     url_field_results = urls["url_field_results"]
     url_lab_results = urls["url_lab_results"]
     for item in [("field_results.csv", url_field_results),
-                    ("lab_results.csv", url_lab_results)]:
+                 ("lab_results.csv", url_lab_results)]:
         try:
             response = requests.get(item[1], allow_redirects=True, timeout=30)
             response.raise_for_status()
@@ -26,10 +26,10 @@ def download_data():
         except requests.exceptions.RequestException as error:
             logging.error("An error occurred: %s", error)
         open(f'../data/{item[0]}', 'wb').write(response.content)
-    logging.info("Data download complete")
+    logging.info("Data download complete.")
         
 
-def clean_data(y):
+def clean_data(y, train_or_inf):
     """Load and process the raw results."""
     field_results = pd.read_csv("../data/field_results.csv", low_memory=False)
     field_results = field_results[field_results["station_type"] == "Surface Water"]
@@ -62,9 +62,9 @@ def clean_data(y):
     df = results.pivot_table(index=['station_id', 'sample_date'],
                                 columns='parameter', values='result', aggfunc='first')
     df.reset_index(inplace=True)
-    mask = df[y].notnull()
-    df = df[mask]
-    df = df.dropna(axis=1, how='all')
+    if train_or_inf == "train":
+        mask = df[y].notnull()
+        df = df[mask]
     values_to_keep = ['station_id',
                         'sample_date',
                         'DissolvedOxygen',
@@ -78,7 +78,11 @@ def clean_data(y):
                         y
                         ]
     df = df[values_to_keep]
-    df.dropna(inplace=True)
+    if train_or_inf == "train":
+        df.dropna(inplace=True)
+    elif train_or_inf == "inf":
+        X_values_to_keep = [val for val in values_to_keep if val != y]
+        df[X_values_to_keep].dropna(inplace=True)
     df.replace("< R.L.", 0, inplace=True)
     column_list = ["DissolvedOxygen",
                     "SpecificConductance",
@@ -91,6 +95,8 @@ def clean_data(y):
                     y
                     ]
     df[column_list] = df[column_list].astype(float)
-    df.sort_values(by=['sample_date'], inplace=True)
-    df.to_parquet("../data/df.parquet")
-    logging.info("Data cleaning complete")
+    if train_or_inf == "train":
+        df.to_parquet("../data/df.parquet")
+    elif train_or_inf == "inf":
+        df.to_parquet("../data/df_inf.parquet")
+    logging.info("Data cleaning complete.")

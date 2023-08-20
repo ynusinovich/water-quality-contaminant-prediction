@@ -44,7 +44,7 @@ if __name__ == "__main__":
     experiment_name="water-quality-prediction-2"
     experiment_ids='3'
     stage = "Production"
-    model_name = "water-quality-predictor-4"
+    model_name = "water-quality-predictor-5"
 
     directory = os.path.dirname(os.path.abspath(__file__))
     os.chdir(directory)

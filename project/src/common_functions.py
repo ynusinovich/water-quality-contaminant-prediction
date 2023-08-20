@@ -1,5 +1,33 @@
 import logging
 import pandas as pd
+import json
+import os
+import logging
+import requests
+
+logging.basicConfig(level=logging.INFO)
+
+
+def download_data():
+    """Download data from the source."""
+    if not os.path.exists("../data/"):
+        os.makedirs("../data/")
+    with open("data_sources.json", "r", encoding="utf-8") as file:
+        urls = json.load(file)
+    url_field_results = urls["url_field_results"]
+    url_lab_results = urls["url_lab_results"]
+    for item in [("field_results.csv", url_field_results),
+                    ("lab_results.csv", url_lab_results)]:
+        try:
+            response = requests.get(item[1], allow_redirects=True, timeout=30)
+            response.raise_for_status()
+        except requests.exceptions.Timeout:
+            logging.error("The request timed out. Try increasing the timeout value.")
+        except requests.exceptions.RequestException as error:
+            logging.error("An error occurred: %s", error)
+        open(f'../data/{item[0]}', 'wb').write(response.content)
+    logging.info("Data download complete")
+        
 
 def clean_data(y):
     """Load and process the raw results."""
@@ -65,4 +93,4 @@ def clean_data(y):
     df[column_list] = df[column_list].astype(float)
     df.sort_values(by=['sample_date'], inplace=True)
     df.to_parquet("../data/df.parquet")
-    logging.info("Data processing complete")
+    logging.info("Data cleaning complete")

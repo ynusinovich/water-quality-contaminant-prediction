@@ -30,6 +30,7 @@ class ModelTrainer():
         train_df = pd.read_parquet("../data/train_df.parquet")
         val_df = pd.read_parquet("../data/val_df.parquet")
         X_col = [c for c in df.columns if c not in [self.y, "sample_date", "station_id"]]
+        logging.info("Clean data loaded.")
         return train_df, val_df, X_col
 
     def run_training(self):
@@ -73,8 +74,7 @@ class ModelTrainer():
             'reg_alpha': hp.loguniform('reg_alpha', -5, -1),
             'reg_lambda': hp.loguniform('reg_lambda', -6, -1),
             'min_child_weight': hp.loguniform('min_child_weight', -1, 3),
-            'objective': 'reg:linear',
-            'seed': 42
+            'objective': 'reg:linear'
             }
         best_result = fmin(
             fn=objective,
@@ -83,7 +83,9 @@ class ModelTrainer():
             max_evals=50,
             trials=Trials()
             )
+        logging.info("Model training complete")
         return best_result
+
 
 @flow
 def train_model(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com",

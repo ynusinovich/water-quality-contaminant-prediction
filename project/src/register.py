@@ -21,7 +21,7 @@ def register_model(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.co
         experiment_ids=experiment_ids,
         run_view_type=ViewType.ACTIVE_ONLY,
         max_results=1,
-        order_by=["metrics.rmse ASC"]
+        order_by=["metrics.val_rmse ASC"]
     )
     run_id = runs[0].info.run_id
     model_uri = f"runs:/{run_id}/model"
@@ -34,14 +34,16 @@ def register_model(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.co
         stage=stage,
         archive_existing_versions=True
     )
+    logging.info("Data cleaning complete")
+    return None
 
 
 if __name__ == "__main__":
     os.environ["AWS_PROFILE"] = "default"
     TRACKING_SERVER_HOST = "ec2-3-90-105-109.compute-1.amazonaws.com"
-    stage = "Production"
     experiment_name="water-quality-prediction-2"
     experiment_ids='3'
+    stage = "Production"
     model_name = "water-quality-predictor-4"
 
     directory = os.path.dirname(os.path.abspath(__file__))

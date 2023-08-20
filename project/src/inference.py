@@ -59,7 +59,9 @@ def run_inference(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com
                                            model_name, y)
     inf_df = inference_pipeline.create_inf_df()
     pred, y_inf = inference_pipeline.run_pred(inf_df)
-    return {"rmse": mean_squared_error(y_inf, pred, squared=False)}
+    rmse = mean_squared_error(y_inf, pred, squared=False)
+    logging.info("RMSE = {rmse}")
+    return {"rmse": rmse}
 
 
 if __name__ == "__main__":

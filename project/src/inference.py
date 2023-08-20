@@ -53,6 +53,8 @@ def run_inference(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com
                        stage="Production",
                        model_name = "water-quality-predictor-3",
                        y="Methyl tert-butyl ether (MTBE)"):
+    directory = os.path.dirname(os.path.abspath(__file__))
+    os.chdir(directory)
     download_data()
     clean_data(y)
     inference_pipeline = InferencePipeline(tracking_server_host, stage,
@@ -70,7 +72,4 @@ if __name__ == "__main__":
     TRACKING_SERVER_HOST = "ec2-3-90-105-109.compute-1.amazonaws.com"
     stage = "Production"
     model_name = "water-quality-predictor-3"
-
-    directory = os.path.dirname(os.path.abspath(__file__))
-    os.chdir(directory)
     run_inference(TRACKING_SERVER_HOST, stage, model_name, y)

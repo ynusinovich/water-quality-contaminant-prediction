@@ -5,12 +5,11 @@ import pandas as pd
 import datetime
 from sklearn.metrics import mean_squared_error
 import mlflow
-from prefect import flow
+from prefect import flow, get_run_logger
 import prefect
 from common_functions import download_data, clean_data
 
 logging.basicConfig(level=logging.INFO)
-logger = prefect.context.logger
 
 
 class InferencePipeline():
@@ -64,6 +63,7 @@ def run_inference(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com
     inf_df = inference_pipeline.create_inf_df()
     pred, y_inf = inference_pipeline.run_pred(inf_df)
     rmse = mean_squared_error(y_inf, pred, squared=False)
+    logger = get_run_logger()
     logger.info("RMSE = {rmse}")
     return {"rmse": rmse}
 

@@ -4,7 +4,6 @@ from mlflow.tracking import MlflowClient
 from mlflow.entities import ViewType
 import mlflow
 from prefect import flow
-from prefect_aws import S3Bucket
 
 logging.basicConfig(level=logging.INFO)
 
@@ -14,7 +13,7 @@ def register_model(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.co
                    stage="Production",
                    experiment_name="water-quality-prediction-2",
                    experiment_ids='3',
-                   model_name = "water-quality-predictor-3"):
+                   model_name = "water-quality-predictor-4"):
     mlflow.set_tracking_uri(f"http://{tracking_server_host}:5000")
     mlflow.set_experiment(experiment_name)
     client = MlflowClient(tracking_uri=f"http://{tracking_server_host}:5000")
@@ -43,7 +42,7 @@ if __name__ == "__main__":
     stage = "Production"
     experiment_name="water-quality-prediction-2"
     experiment_ids='3'
-    model_name = "water-quality-predictor-3"
+    model_name = "water-quality-predictor-4"
 
     directory = os.path.dirname(os.path.abspath(__file__))
     os.chdir(directory)

@@ -10,7 +10,7 @@ import prefect
 from common_functions import download_data, clean_data
 
 logging.basicConfig(level=logging.INFO)
-logger = prefect.context.get("logger")
+logger = prefect.context.logger
 
 
 class InferencePipeline():

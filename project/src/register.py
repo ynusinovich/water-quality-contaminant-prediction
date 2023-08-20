@@ -15,7 +15,7 @@ def register(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com",
                    stage="Production",
                    experiment_name="water-quality-prediction-2",
                    experiment_ids='3',
-                   model_name = "water-quality-predictor-4"):
+                   model_name = "water-quality-predictor-5"):
     """Register the model that has the highest validation RMSE."""
     directory = os.path.dirname(os.path.abspath(__file__))
     os.chdir(directory)

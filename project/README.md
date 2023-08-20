@@ -1,7 +1,7 @@
 # MLOps Zoomcamp from DataTalks.club: Final Project
 ## Predicting Concentrations of Expensive-to-Measure Water Quality Contaminants
 ### MLFlow server connection
-mlflow server -h 0.0.0.0 -p 5000 --backend-store-uri postgresql://mlflow:k1MTt9XvU7WcZb8bWI0M@mlflow-database.cshyhxremkby.us-east-1.rds.amazonaws.com:5432/mlflow_db --default-artifact-root s3://mlops-zoomcamp-2023/project
+mlflow server -h 0.0.0.0 -p 5000 --backend-store-uri postgresql://mlflow:POSTGRES_PASSWORD@mlflow-database.cshyhxremkby.us-east-1.rds.amazonaws.com:5432/mlflow_db --default-artifact-root s3://mlops-zoomcamp-2023/project
 ### Prefect setup
 prefect cloud login
 prefect project init

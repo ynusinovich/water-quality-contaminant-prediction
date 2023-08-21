@@ -30,7 +30,7 @@ class InferencePipeline():
         """Read data from local."""
         df = pd.read_parquet("../data/df.parquet")
         return df
-    
+
     def load_model_and_dv(self):
         """Load model and dictionary vectorizer from MLFlow server."""
         mlflow.set_tracking_uri(f"http://{self.tracking_server_host}:5000")
@@ -47,7 +47,8 @@ class InferencePipeline():
 
     def run_pred(self, inf_df, model, dv):
         """Load mlflow model and artifacts, process inference data, and run prediction."""
-        inf_df = inf_df[(inf_df["sample_date"] >= self.inf_min) & (inf_df["sample_date"] < self.inf_max)]
+        inf_df = inf_df[(inf_df["sample_date"] >= self.inf_min) &
+                        (inf_df["sample_date"] < self.inf_max)]
         X_col = [c for c in inf_df.columns if c not in [self.y, "sample_date", "station_id"]]
         X_dicts = inf_df[X_col].to_dict(orient='records')
         X_inf = dv.transform(X_dicts)
@@ -56,6 +57,7 @@ class InferencePipeline():
         pred = model.predict(X_inf)
         return pred, y_inf, inf_df
 
+# pylint: disable=too-many-arguments
 @flow
 def inference(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com",
               stage="Production",

@@ -1,0 +1,4 @@
+[MESSAGES CONTROL]
+
+# Disable invalid-name check
+disable = invalid-name

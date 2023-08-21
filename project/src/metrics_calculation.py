@@ -1,14 +1,18 @@
+# pylint: disable=missing-module-docstring
 import datetime
-from dateutil.relativedelta import relativedelta
 import time
 import logging
 import os
+from dateutil.relativedelta import relativedelta
 import pandas as pd
 from psycopg2 import connect
+# pylint: disable=import-error
 from prefect import task, flow, get_run_logger
-
+# pylint: disable=import-error
 from evidently.report import Report
+# pylint: disable=import-error
 from evidently import ColumnMapping
+# pylint: disable=import-error
 from evidently.metrics import ColumnDriftMetric, DatasetDriftMetric, DatasetMissingValuesMetric, \
                               DatasetCorrelationsMetric
 
@@ -19,7 +23,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s]: %(m
 
 SEND_TIMEOUT = 1
 
-create_table_statement = """
+CREATE_TABLE_STATEMENT = """
 drop table if exists dummy_metrics;
 create table dummy_metrics(
     timestamp timestamp,
@@ -50,14 +54,15 @@ def prep_db():
                       )
         conn.autocommit = True
         cursor = conn.cursor()
-        sql = f"CREATE DATABASE {db_name};";
+        sql = f"CREATE DATABASE {db_name};"
         cursor.execute(sql)
         conn.close()
     with connect("host=localhost port=5432 dbname=test user=postgres password=example") as conn:
         cursor = conn.cursor()
-        cursor.execute(create_table_statement)
+        cursor.execute(CREATE_TABLE_STATEMENT)
 
-
+# pylint: disable=too-many-arguments
+# pylint: disable=too-many-locals
 @task(retries=2, retry_delay_seconds=2, name="calculate metrics")
 def calculate_metrics(curr, i,
                       tracking_server_host, stage, model_name,
@@ -84,14 +89,18 @@ def calculate_metrics(curr, i,
     prediction_drift = result['metrics'][0]['result']['drift_score']
     num_drifted_columns = result['metrics'][1]['result']['number_of_drifted_columns']
     share_missing_values = result['metrics'][2]['result']['current']['share_of_missing_values']
-    if not pd.isnull(result['metrics'][3]["result"]["current"]["stats"]["pearson"]["target_prediction_correlation"]):
-        target_prediction_correlation = result['metrics'][3]["result"]["current"]["stats"]["pearson"]["target_prediction_correlation"]
+    if not pd.isnull(result['metrics'][3]["result"]["current"]
+                     ["stats"]["pearson"]["target_prediction_correlation"]):
+        target_prediction_correlation = (result['metrics'][3]["result"]["current"]
+                                         ["stats"]["pearson"]["target_prediction_correlation"])
     else:
         target_prediction_correlation = 0
 
     curr.execute(
-                 "insert into dummy_metrics(timestamp, prediction_drift, num_drifted_columns, share_missing_values, target_prediction_correlation) values (%s, %s, %s, %s, %s)",
-                 (start_date, prediction_drift, num_drifted_columns, share_missing_values, target_prediction_correlation)
+                 "insert into dummy_metrics(timestamp, prediction_drift, num_drifted_columns, \
+                  share_missing_values, target_prediction_correlation) values (%s, %s, %s, %s, %s)",
+                 (start_date, prediction_drift, num_drifted_columns,
+                  share_missing_values, target_prediction_correlation)
                 )
 
 @flow
@@ -99,7 +108,8 @@ def batch_monitoring_backfill(tracking_server_host = "ec2-3-90-105-109.compute-1
                               stage = "Production",
                               model_name = "water-quality-predictor-3",
                               y = "Methyl tert-butyl ether (MTBE)"):
-    """Generates drift, correlations, and missing values for the months of 2019 compared to past months."""
+    """Calculates drift, correlations, and missing values 
+       for the months of 2019 compared to past months."""
     directory = os.path.dirname(os.path.abspath(__file__))
     os.chdir(directory)
     download_data()

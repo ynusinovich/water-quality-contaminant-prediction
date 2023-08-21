@@ -25,7 +25,6 @@ def download_data():
             logging.error("The request timed out. Try increasing the timeout value.")
         except requests.exceptions.RequestException as error:
             logging.error("An error occurred: %s", error)
-        # open(f'../data/{item[0]}', 'wb').write(response.content)
         file_path = f'../data/{item[0]}'
         with open(file_path, 'wb') as file:
             file.write(response.content)
@@ -66,17 +65,17 @@ def clean_data(y):
                                 columns='parameter', values='result', aggfunc='first')
     df.reset_index(inplace=True)
     values_to_keep = ['station_id',
-                        'sample_date',
-                        'DissolvedOxygen',
-                        'SpecificConductance',
-                        "Total Alkalinity",
-                        "Total Dissolved Solids",
-                        "Total Organic Carbon",
-                        'Turbidity',
-                        'WaterTemperature',
-                        'pH',
-                        y
-                        ]
+                      'sample_date',
+                      'DissolvedOxygen',
+                      'SpecificConductance',
+                      "Total Alkalinity",
+                      "Total Dissolved Solids",
+                      "Total Organic Carbon",
+                      'Turbidity',
+                      'WaterTemperature',
+                      'pH',
+                      y
+                      ]
     df = df[values_to_keep]
     df.replace("< R.L.", 0, inplace=True)
     numerical_list = ["DissolvedOxygen",
@@ -92,3 +91,4 @@ def clean_data(y):
     df[numerical_list] = df[numerical_list].astype(float)
     df.to_parquet("../data/df.parquet")
     logging.info("Data cleaning complete.")
+    return numerical_list

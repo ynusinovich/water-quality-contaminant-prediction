@@ -16,21 +16,22 @@ logging.basicConfig(level=logging.INFO)
 class InferencePipeline():
     """Class to perform inference."""
 
-    def __init__(self, tracking_server_host, stage, model_name, y):
+    def __init__(self, tracking_server_host, stage,
+                 model_name, y, inf_min, inf_max):
         """Initialize the inference pipeline"""
         self.tracking_server_host = tracking_server_host
         self.stage = stage
         self.model_name = model_name
         self.y = y
+        self.inf_min = inf_min
+        self.inf_max = inf_max
 
     def create_inf_df(self):
         """Create inference dataframe from latest data."""
         df = pd.read_parquet("../data/df.parquet")
-        X_values_to_keep = [X for X in df.columns if X != self.y]
-        df[X_values_to_keep].dropna(inplace=True)
-        test_max = datetime.date(2019,1,1)
-        inf_df = df[df["sample_date"] > test_max]
-        return inf_df
+        # X_values_to_keep = [X for X in df.columns if X != self.y]
+        # df[X_values_to_keep].dropna(inplace=True)
+        return df
 
     def run_pred(self, inf_df):
         """Load mlflow model and artifacts, process inference data, and run prediction."""
@@ -45,6 +46,7 @@ class InferencePipeline():
         with open("../preprocessor/preprocessor.b", "rb") as f_in:
             dv = pickle.load(f_in)
 
+        inf_df = inf_df[(inf_df["sample_date"] >= self.inf_min) & (inf_df["sample_date"] < self.inf_max)]
         X_col = [c for c in inf_df.columns if c not in [self.y, "sample_date", "station_id"]]
         X_dicts = inf_df[X_col].to_dict(orient='records')
         X_inf = dv.transform(X_dicts)
@@ -57,14 +59,18 @@ class InferencePipeline():
 def inference(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com",
                        stage="Production",
                        model_name = "water-quality-predictor-3",
-                       y="Methyl tert-butyl ether (MTBE)"):
+                       y="Methyl tert-butyl ether (MTBE)",
+                       download_and_clean=True,
+                       inf_min=datetime.date(2019,1,1),
+                       inf_max=datetime.date.today()):
     """Main function for inference pipeline with new water quality data."""
     directory = os.path.dirname(os.path.abspath(__file__))
     os.chdir(directory)
-    download_data()
-    clean_data(y)
+    if download_and_clean:
+        download_data()
+        clean_data(y)
     inference_pipeline = InferencePipeline(tracking_server_host, stage,
-                                           model_name, y)
+                                           model_name, y, inf_min, inf_max)
     inf_df = inference_pipeline.create_inf_df()
     pred, y_inf = inference_pipeline.run_pred(inf_df)
     notnull_y_ind = [index for index, value in enumerate(y_inf) if pd.notnull(value)]

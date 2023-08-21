@@ -23,8 +23,8 @@ def train_val_test_split():
     test_max = datetime.date(2019,1,1)
     df_model = df[df["sample_date"] < test_max]
     train_df = df_model[df_model["sample_date"] < train_max]
-    val_df = df_model[(df_model["sample_date"] < val_max) & (df_model["sample_date"] > train_max)]
-    test_df = df_model[df_model["sample_date"] > val_max]
+    val_df = df_model[(df_model["sample_date"] >= train_max) & (df_model["sample_date"] < val_max)]
+    test_df = df_model[df_model["sample_date"] >= val_max]
 
     train_df.to_parquet("../data/train_df.parquet")
     val_df.to_parquet("../data/val_df.parquet")

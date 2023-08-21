@@ -58,12 +58,12 @@ class InferencePipeline():
 
 @flow
 def inference(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com",
-                       stage="Production",
-                       model_name = "water-quality-predictor-3",
-                       y="Methyl tert-butyl ether (MTBE)",
-                       download_and_clean=True,
-                       inf_min=datetime.date(2019,1,1),
-                       inf_max=datetime.date.today()):
+              stage="Production",
+              model_name = "water-quality-predictor-3",
+              y="Methyl tert-butyl ether (MTBE)",
+              download_and_clean=True,
+              inf_min=datetime.date(2019,1,1),
+              inf_max=datetime.date.today()):
     """Main function for inference pipeline with new water quality data."""
     directory = os.path.dirname(os.path.abspath(__file__))
     os.chdir(directory)
@@ -72,7 +72,8 @@ def inference(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com",
         clean_data(y)
     inference_pipeline = InferencePipeline(tracking_server_host, stage,
                                            model_name, y, inf_min, inf_max)
-    inf_df, model, dv = inference_pipeline.load_data_and_model()
+    inf_df = inference_pipeline.load_data()
+    model, dv = inference_pipeline.load_model_and_dv()
     pred, y_inf, inf_df = inference_pipeline.run_pred(inf_df, model, dv)
     notnull_y_indexes = [index for index, value in enumerate(y_inf) if pd.notnull(value)]
     notnull_y_inf = y_inf[y_inf.notnull()]

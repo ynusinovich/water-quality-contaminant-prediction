@@ -57,6 +57,7 @@ class InferencePipeline():
         pred = model.predict(X_inf)
         return pred, y_inf, inf_df
 
+
 # pylint: disable=too-many-arguments
 @flow
 def inference(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com",

@@ -10,6 +10,7 @@ prefect deploy project/src/create_dataset.py:create_dataset -n 'project-deployme
 prefect deploy project/src/train_model.py:train_model -n 'project-deployment-train' -p project-pool
 prefect deploy project/src/register.py:register -n 'project-deployment-register' -p project-pool
 prefect deploy project/src/inference.py:inference -n 'project-deployment-inference' -p project-pool
+prefect deploy project/src/metrics_calculation.py:batch_monitoring_backfill -n 'project-deployment-metrics' -p project-pool
 ### Building Services for Monitoring
 docker-compose up --build
 ### Grafana default username and password:

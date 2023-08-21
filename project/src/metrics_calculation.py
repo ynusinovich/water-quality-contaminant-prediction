@@ -31,7 +31,7 @@ create table dummy_metrics(
 """
 
 
-# @task(retries=2, retry_delay_seconds=2, name="prep db")
+@task(retries=2, retry_delay_seconds=2, name="prep db")
 def prep_db():
     """Creates database for storing metrics."""
     with connect("host=localhost port=5432 user=postgres password=example") as conn:
@@ -58,7 +58,7 @@ def prep_db():
         cursor.execute(create_table_statement)
 
 
-# @task(retries=2, retry_delay_seconds=2, name="calculate metrics")
+@task(retries=2, retry_delay_seconds=2, name="calculate metrics")
 def calculate_metrics(curr, i,
                       tracking_server_host, stage, model_name,
                       y, begin, column_mapping, report,
@@ -94,7 +94,7 @@ def calculate_metrics(curr, i,
                  (start_date, prediction_drift, num_drifted_columns, share_missing_values, target_prediction_correlation)
                 )
 
-# @flow
+@flow
 def batch_monitoring_backfill(tracking_server_host = "ec2-3-90-105-109.compute-1.amazonaws.com",
                               stage = "Production",
                               model_name = "water-quality-predictor-3",

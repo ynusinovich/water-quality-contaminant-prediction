@@ -138,8 +138,8 @@ def batch_monitoring_backfill(tracking_server_host = "ec2-3-90-105-109.compute-1
                 time.sleep(SEND_TIMEOUT - seconds_elapsed)
             while last_send < new_send:
                 last_send = last_send + datetime.timedelta(seconds=1)
-            # logger = get_run_logger()
-            # logger.info("Data sent")
+            logger = get_run_logger()
+            logger.info("Data sent")
 
 if __name__ == '__main__':
     batch_monitoring_backfill()

@@ -33,6 +33,7 @@ create table dummy_metrics(
 
 @task(retries=2, retry_delay_seconds=2, name="prep db")
 def prep_db():
+    """Creates database for storing metrics."""
     with connect("host=localhost port=5432 user=postgres password=example") as conn:
         cursor = conn.cursor()
         db_name = 'test'
@@ -61,6 +62,7 @@ def prep_db():
 def calculate_metrics(curr, i,
                       tracking_server_host, stage, model_name,
                       y, begin, column_mapping, report):
+    """Calculates the metrics and loads them into Postgres."""
     inference_pipeline = InferencePipeline(tracking_server_host, stage,
                                                model_name, y, None, None)
     df = inference_pipeline.load_data()
@@ -101,6 +103,7 @@ def batch_monitoring_backfill(tracking_server_host = "ec2-3-90-105-109.compute-1
                               stage = "Production",
                               model_name = "water-quality-predictor-3",
                               y = "Methyl tert-butyl ether (MTBE)"):
+    """Generates drift, correlations, and missing values for the months of 2019 compared to past months."""
     directory = os.path.dirname(os.path.abspath(__file__))
     os.chdir(directory)
     download_data()

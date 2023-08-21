@@ -53,9 +53,9 @@ class InferencePipeline():
         y_inf = inf_df[self.y]
 
         pred = model.predict(X_inf)
-        return pred, y_inf
+        return pred, y_inf, inf_df
 
-@flow
+# @flow
 def inference(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com",
                        stage="Production",
                        model_name = "water-quality-predictor-3",
@@ -72,15 +72,14 @@ def inference(tracking_server_host="ec2-3-90-105-109.compute-1.amazonaws.com",
     inference_pipeline = InferencePipeline(tracking_server_host, stage,
                                            model_name, y, inf_min, inf_max)
     inf_df = inference_pipeline.create_inf_df()
-    pred, y_inf = inference_pipeline.run_pred(inf_df)
-    notnull_y_ind = [index for index, value in enumerate(y_inf) if pd.notnull(value)]
-    notnull_y = y_inf[y_inf.notnull()]
-    notnull_pred = pred[notnull_y_ind]
-    rmse = mean_squared_error(notnull_y, notnull_pred, squared=False)
+    pred, y_inf, inf_df = inference_pipeline.run_pred(inf_df)
+    notnull_y_indexes = [index for index, value in enumerate(y_inf) if pd.notnull(value)]
+    notnull_y_inf = y_inf[y_inf.notnull()]
+    notnull_pred = pred[notnull_y_indexes]
+    rmse = mean_squared_error(notnull_y_inf, notnull_pred, squared=False)
     logger = get_run_logger()
     logger.info(f"rmse = {rmse}")
     inf_df["pred"] = pred
-    inf_df.to_csv("../data/results.csv")
     return rmse, pred
 
 

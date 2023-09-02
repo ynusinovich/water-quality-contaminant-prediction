@@ -1,5 +1,5 @@
 # MLOps Zoomcamp course from DataTalks.Club
-Work for MLOps Zoomcamp course from DataTalks.Club https://github.com/DataTalksClub/mlops-zoomcamp
+Based on MLOps Zoomcamp course from DataTalks.Club https://github.com/DataTalksClub/mlops-zoomcamp
 
 Syllabus
 Module 1: Introduction
